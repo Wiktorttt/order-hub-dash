@@ -87,26 +87,24 @@ export default function PrintDocuments() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="packing-list">Packing List</SelectItem>
-              <SelectItem value="shipping-label">Shipping Labels</SelectItem>
-              <SelectItem value="invoice">Invoices</SelectItem>
-              <SelectItem value="order-summary">Order Summary</SelectItem>
-              <SelectItem value="customs-declaration">Customs Declaration</SelectItem>
+              <SelectItem value="station-1">Station 1</SelectItem>
+              <SelectItem value="station-2">Station 2</SelectItem>
+              <SelectItem value="both">Both</SelectItem>
             </SelectContent>
           </Select>
         </CardContent>
       </Card>
 
-      {/* Date Range and Filters */}
+      {/* Date Range */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Filters
+            <Calendar className="h-5 w-5" />
+            Date Range
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="flex items-center gap-4">
             <div>
               <Label htmlFor="start-date">Start Date</Label>
               <Input
@@ -125,10 +123,37 @@ export default function PrintDocuments() {
                 onChange={(e) => setEndDate(e.target.value)}
               />
             </div>
+            <div className="flex items-end">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  const today = new Date().toISOString().split('T')[0]
+                  setStartDate(today)
+                  setEndDate(today)
+                }}
+              >
+                Today
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="h-5 w-5" />
+            Filters
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4">
             <div>
               <Label>Status Filter</Label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger>
+                <SelectTrigger className="w-40">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

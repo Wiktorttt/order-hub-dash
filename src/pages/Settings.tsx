@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Bell, Package, Truck, User } from "lucide-react"
+import { Settings as SettingsIcon, Bell, Package, User, Link } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -132,63 +132,30 @@ export default function Settings() {
         </CardContent>
       </Card>
 
-      {/* Courier Settings */}
+      {/* Baselinker Account */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Truck className="h-5 w-5" />
-            Courier Integration
+            <Link className="h-5 w-5" />
+            Baselinker Account
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-4">
-            <div>
-              <Label>Preferred Courier for Express Delivery</Label>
-              <Select defaultValue="fedex">
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="fedex">FedEx Express</SelectItem>
-                  <SelectItem value="ups">UPS Next Day Air</SelectItem>
-                  <SelectItem value="dhl">DHL Express</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label>Preferred Courier for Standard Delivery</Label>
-              <Select defaultValue="ups">
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ups">UPS Ground</SelectItem>
-                  <SelectItem value="fedex">FedEx Ground</SelectItem>
-                  <SelectItem value="usps">USPS Priority</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          
-          <Separator />
-          
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="auto-tracking">Auto-generate tracking numbers</Label>
-                <p className="text-sm text-muted-foreground">Automatically create tracking IDs for new orders</p>
-              </div>
-              <Switch id="auto-tracking" defaultChecked />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="courier-sync">Sync with courier APIs</Label>
-                <p className="text-sm text-muted-foreground">Keep shipping status updated in real-time</p>
-              </div>
-              <Switch id="courier-sync" />
-            </div>
+          <div>
+            <Label>Select Account</Label>
+            <Select defaultValue="all">
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Accounts</SelectItem>
+                <SelectItem value="account-1">Production Account</SelectItem>
+                <SelectItem value="account-2">Staging Account</SelectItem>
+                <SelectItem value="account-3">Development Account</SelectItem>
+                <SelectItem value="account-4">Test Account</SelectItem>
+                <SelectItem value="account-5">Backup Account</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
@@ -210,17 +177,6 @@ export default function Settings() {
                 <Button variant="outline" size="sm">Export as CSV</Button>
                 <Button variant="outline" size="sm">Export as JSON</Button>
                 <Button variant="outline" size="sm">Export as PDF Report</Button>
-              </div>
-            </div>
-            
-            <Separator />
-            
-            <div>
-              <h4 className="font-medium text-destructive">Danger Zone</h4>
-              <p className="text-sm text-muted-foreground mb-2">Irreversible actions that affect your data</p>
-              <div className="flex gap-2">
-                <Button variant="destructive" size="sm">Clear All Data</Button>
-                <Button variant="outline" size="sm">Reset Settings</Button>
               </div>
             </div>
           </div>

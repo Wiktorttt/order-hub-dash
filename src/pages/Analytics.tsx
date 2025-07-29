@@ -1,14 +1,20 @@
-import { TrendingUp, Package, Clock, Truck, DollarSign } from "lucide-react"
+import { useState } from "react"
+import { TrendingUp, Package, Clock, Truck, DollarSign, Calendar } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { mockOrders } from "@/data/mockOrders"
 
 export default function Analytics() {
-  const totalOrders = mockOrders.length
-  const pendingOrders = mockOrders.filter(o => o.status === 'pending').length
-  const processingOrders = mockOrders.filter(o => o.status === 'processing').length
-  const shippedOrders = mockOrders.filter(o => o.status === 'shipped').length
-  const urgentOrders = mockOrders.filter(o => o.daysLeftToPack <= 1).length
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0])
+  
+  const filteredOrders = mockOrders.filter(order => order.orderDate === selectedDate)
+  const totalOrders = filteredOrders.length
+  const pendingOrders = filteredOrders.filter(o => o.status === 'pending').length
+  const processingOrders = filteredOrders.filter(o => o.status === 'processing').length
+  const shippedOrders = filteredOrders.filter(o => o.status === 'shipped').length
+  const urgentOrders = filteredOrders.filter(o => o.daysLeftToPack <= 1).length
   
   const courierStats = mockOrders.reduce((acc, order) => {
     acc[order.courier] = (acc[order.courier] || 0) + 1
@@ -31,8 +37,34 @@ export default function Analytics() {
         </div>
       </div>
 
+      {/* Date Selection */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-primary" />
+              <label htmlFor="analytics-date" className="text-sm font-medium">Select Date:</label>
+            </div>
+            <Input
+              id="analytics-date"
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="w-48"
+            />
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
+            >
+              Today
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
@@ -40,7 +72,6 @@ export default function Analytics() {
               <div>
                 <p className="text-sm text-muted-foreground">Total Orders</p>
                 <p className="text-2xl font-bold">{totalOrders}</p>
-                <p className="text-xs text-success">+12% from last month</p>
               </div>
             </div>
           </CardContent>
@@ -53,35 +84,7 @@ export default function Analytics() {
               <div>
                 <p className="text-sm text-muted-foreground">Urgent Orders</p>
                 <p className="text-2xl font-bold">{urgentOrders}</p>
-                <p className="text-xs text-destructive">Needs immediate attention</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-success" />
-              <div>
-                <p className="text-sm text-muted-foreground">Completion Rate</p>
-                <p className="text-2xl font-bold">
-                  {Math.round((shippedOrders / totalOrders) * 100)}%
-                </p>
-                <p className="text-xs text-success">+5% from last month</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Package className="h-5 w-5 text-primary" />
-              <div>
-                <p className="text-sm text-muted-foreground">Avg. Pack Time</p>
-                <p className="text-2xl font-bold">{averagePackingTime.toFixed(1)} days</p>
-                <p className="text-xs text-muted-foreground">Per order</p>
+                <p className="text-xs text-destructive">One day left</p>
               </div>
             </div>
           </CardContent>

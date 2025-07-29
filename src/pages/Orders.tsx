@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Search, Package, Clock, Truck, Eye, Filter } from "lucide-react"
+import { Search, Package, Clock, Truck, Eye, Filter, Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,6 +13,7 @@ export default function Orders() {
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0])
 
   const filteredOrders = mockOrders.filter(order => {
     const matchesSearch = 
@@ -22,8 +23,9 @@ export default function Orders() {
       order.productName.toLowerCase().includes(searchQuery.toLowerCase())
     
     const matchesStatus = statusFilter === "all" || order.status === statusFilter
+    const matchesDate = order.orderDate === selectedDate
     
-    return matchesSearch && matchesStatus
+    return matchesSearch && matchesStatus && matchesDate
   })
 
   const getStatusColor = (status: string) => {
@@ -65,15 +67,41 @@ export default function Orders() {
         </div>
       </div>
 
+      {/* Date Selection */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-primary" />
+              <label htmlFor="order-date" className="text-sm font-medium">Select Date:</label>
+            </div>
+            <Input
+              id="order-date"
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="w-48"
+            />
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
+            >
+              Today
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
               <Package className="h-5 w-5 text-primary" />
               <div>
                 <p className="text-sm text-muted-foreground">Total Orders</p>
-                <p className="text-2xl font-bold">{mockOrders.length}</p>
+                <p className="text-2xl font-bold">{filteredOrders.length}</p>
               </div>
             </div>
           </CardContent>
@@ -81,10 +109,10 @@ export default function Orders() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-warning" />
+              <Package className="h-5 w-5 text-blue-500" />
               <div>
-                <p className="text-sm text-muted-foreground">Pending</p>
-                <p className="text-2xl font-bold">{mockOrders.filter(o => o.status === 'pending').length}</p>
+                <p className="text-sm text-muted-foreground">Termo</p>
+                <p className="text-2xl font-bold">{filteredOrders.filter(o => o.productName.includes('Termo')).length}</p>
               </div>
             </div>
           </CardContent>
@@ -92,10 +120,10 @@ export default function Orders() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <Truck className="h-5 w-5 text-primary" />
+              <Package className="h-5 w-5 text-green-500" />
               <div>
-                <p className="text-sm text-muted-foreground">Processing</p>
-                <p className="text-2xl font-bold">{mockOrders.filter(o => o.status === 'processing').length}</p>
+                <p className="text-sm text-muted-foreground">D/N</p>
+                <p className="text-2xl font-bold">{filteredOrders.filter(o => o.productName.includes('D/N')).length}</p>
               </div>
             </div>
           </CardContent>
@@ -103,10 +131,21 @@ export default function Orders() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <Package className="h-5 w-5 text-success" />
+              <Package className="h-5 w-5 text-orange-500" />
               <div>
-                <p className="text-sm text-muted-foreground">Shipped</p>
-                <p className="text-2xl font-bold">{mockOrders.filter(o => o.status === 'shipped').length}</p>
+                <p className="text-sm text-muted-foreground">Dachowki</p>
+                <p className="text-2xl font-bold">{filteredOrders.filter(o => o.productName.includes('Dachowki')).length}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <Package className="h-5 w-5 text-purple-500" />
+              <div>
+                <p className="text-sm text-muted-foreground">Mixed</p>
+                <p className="text-2xl font-bold">{filteredOrders.filter(o => !o.productName.includes('Termo') && !o.productName.includes('D/N') && !o.productName.includes('Dachowki')).length}</p>
               </div>
             </div>
           </CardContent>
@@ -160,29 +199,29 @@ export default function Orders() {
             {filteredOrders.map((order) => (
               <div
                 key={order.orderId}
-                className="p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                className="p-3 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
                 onClick={() => setSelectedOrder(order)}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
                     <div>
-                      <h3 className="font-semibold">{order.orderId}</h3>
-                      <p className="text-sm text-muted-foreground">{order.customerName}</p>
+                      <h3 className="font-semibold text-sm">{order.orderId}</h3>
+                      <p className="text-xs text-muted-foreground">{order.customerName}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium">{order.productName}</p>
-                      <p className="text-sm text-muted-foreground">Track: {order.trackId}</p>
+                      <p className="text-xs text-muted-foreground">Track: {order.trackId}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
                     <div className="text-right">
-                      <p className="text-sm text-muted-foreground">Courier</p>
+                      <p className="text-xs text-muted-foreground">Courier</p>
                       <p className="text-sm font-medium">{order.courier}</p>
                     </div>
                     
                     <div className="text-right">
-                      <p className="text-sm text-muted-foreground">Time Left</p>
+                      <p className="text-xs text-muted-foreground">Time Left</p>
                       <p className={`text-sm font-bold ${getDaysLeftColor(order.daysLeftToPack)}`}>
                         {order.daysLeftToPack} days
                       </p>
@@ -197,8 +236,8 @@ export default function Orders() {
                       </Badge>
                     </div>
 
-                    <Button variant="ghost" size="icon">
-                      <Eye className="h-4 w-4" />
+                    <Button variant="ghost" size="sm">
+                      <Eye className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>
