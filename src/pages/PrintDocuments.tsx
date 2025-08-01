@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Calendar, Download, FileText, Filter, Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -6,25 +6,47 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { mockOrders } from "@/data/mockOrders"
+import { useDataMode } from "@/contexts/DataContext"
+import { dataService } from "@/services/dataService"
 
 export default function PrintDocuments() {
-  const [startDate, setStartDate] = useState("")
-  const [endDate, setEndDate] = useState("")
+  const [startDate, setStartDate] = useState<string>(new Date().toISOString().split('T')[0])
+  const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0])
   const [selectedOrders, setSelectedOrders] = useState<string[]>([])
   const [documentType, setDocumentType] = useState("both")
   const [statusFilter, setStatusFilter] = useState("all")
+  const [orders, setOrders] = useState<Array<{
+    orderId: string;
+    productName: string;
+    customerName: string;
+    status: string;
+    orderDate: string;
+  }>>([])
+  const [loading, setLoading] = useState(false)
+  
+  const { useRealData } = useDataMode()
 
-  const filteredOrders = mockOrders.filter(order => {
-    const orderDate = new Date(order.orderDate)
-    const start = startDate ? new Date(startDate) : null
-    const end = endDate ? new Date(endDate) : null
-    
-    const dateMatch = (!start || orderDate >= start) && (!end || orderDate <= end)
-    const statusMatch = statusFilter === "all" || order.status === statusFilter
-    
-    return dateMatch && statusMatch
-  })
+  const fetchPrintOrders = async () => {
+    setLoading(true)
+    try {
+      const result = await dataService.getPrintOrders({
+        startDate,
+        endDate,
+        station: documentType as "station1" | "station2" | "both",
+        status: statusFilter === 'all' ? undefined : statusFilter
+      }, useRealData)
+      
+      setOrders(result.orders)
+    } catch (error) {
+      console.error('Failed to fetch print orders:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchPrintOrders()
+  }, [startDate, endDate, documentType, statusFilter, useRealData])
 
   const handleOrderSelection = (orderId: string, checked: boolean) => {
     if (checked) {
@@ -36,7 +58,7 @@ export default function PrintDocuments() {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedOrders(filteredOrders.map(order => order.orderId))
+      setSelectedOrders(orders.map(order => order.orderId))
     } else {
       setSelectedOrders([])
     }
@@ -82,13 +104,13 @@ export default function PrintDocuments() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Select value={documentType} onValueChange={setDocumentType} defaultValue="both">
+          <Select value={documentType} onValueChange={setDocumentType}>
             <SelectTrigger className="w-64">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="station-1">Station 1</SelectItem>
-              <SelectItem value="station-2">Station 2</SelectItem>
+              <SelectItem value="station1">Station 1</SelectItem>
+              <SelectItem value="station2">Station 2</SelectItem>
               <SelectItem value="both">Both</SelectItem>
             </SelectContent>
           </Select>
@@ -186,12 +208,13 @@ export default function PrintDocuments() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Select Orders ({filteredOrders.length} available)</span>
+            <span>Select Orders ({loading ? '...' : orders.length} available)</span>
             <div className="flex items-center gap-2">
               <Checkbox
                 id="select-all"
-                checked={selectedOrders.length === filteredOrders.length && filteredOrders.length > 0}
+                checked={selectedOrders.length === orders.length && orders.length > 0}
                 onCheckedChange={handleSelectAll}
+                disabled={loading}
               />
               <Label htmlFor="select-all" className="text-sm">
                 Select All
@@ -201,7 +224,11 @@ export default function PrintDocuments() {
         </CardHeader>
         <CardContent>
           <div className="space-y-2 max-h-96 overflow-y-auto">
-            {filteredOrders.map((order) => (
+            {loading ? (
+              <div className="text-center py-8 text-muted-foreground">
+                Loading orders...
+              </div>
+            ) : orders.map((order) => (
               <div
                 key={order.orderId}
                 className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
@@ -227,7 +254,7 @@ export default function PrintDocuments() {
               </div>
             ))}
             
-            {filteredOrders.length === 0 && (
+            {!loading && orders.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
                 No orders found for the selected date range and filters.
               </div>
@@ -245,7 +272,7 @@ export default function PrintDocuments() {
           <div className="flex gap-4">
             <Button 
               onClick={handlePrint}
-              disabled={selectedOrders.length === 0}
+              disabled={selectedOrders.length === 0 || loading}
               className="flex items-center gap-2"
             >
               <Printer className="h-4 w-4" />
@@ -254,7 +281,7 @@ export default function PrintDocuments() {
             <Button 
               variant="outline"
               onClick={handleDownload}
-              disabled={selectedOrders.length === 0}
+              disabled={selectedOrders.length === 0 || loading}
               className="flex items-center gap-2"
             >
               <Download className="h-4 w-4" />

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Search, Package, Clock, Truck, Eye, Filter, Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { OrderDetails } from "@/components/OrderDetails"
-import { mockOrders } from "@/data/mockOrders"
+import { useDataMode } from "@/contexts/DataContext"
+import { dataService } from "@/services/dataService"
 import { Order } from "@/types/order"
 
 export default function Orders() {
@@ -14,19 +15,43 @@ export default function Orders() {
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0])
+  const [orders, setOrders] = useState<Order[]>([])
+  const [totals, setTotals] = useState({ total: 0, termo: 0, dn: 0, dachowki: 0, mixed: 0 })
+  const [loading, setLoading] = useState(false)
+  
+  const { useRealData } = useDataMode()
 
-  const filteredOrders = mockOrders.filter(order => {
-    const matchesSearch = 
-      order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.trackId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.productName.toLowerCase().includes(searchQuery.toLowerCase())
-    
-    const matchesStatus = statusFilter === "all" || order.status === statusFilter
-    const matchesDate = order.orderDate === selectedDate
-    
-    return matchesSearch && matchesStatus && matchesDate
-  })
+  // Fetch orders data
+  const fetchOrders = async () => {
+    setLoading(true)
+    try {
+      const result = await dataService.getOrders({
+        date: selectedDate,
+        status: statusFilter === 'all' ? undefined : statusFilter
+      }, useRealData)
+      
+      setOrders(result.orders)
+      setTotals(result.totals)
+    } catch (error) {
+      console.error('Failed to fetch orders:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchOrders()
+  }, [selectedDate, statusFilter, useRealData])
+
+  // Filter orders by search term (client-side)
+  const filteredOrders = searchQuery 
+    ? orders.filter(order => 
+        order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.trackId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.productName.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : orders
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -101,7 +126,7 @@ export default function Orders() {
               <Package className="h-5 w-5 text-primary" />
               <div>
                 <p className="text-sm text-muted-foreground">Total Orders</p>
-                <p className="text-2xl font-bold">{filteredOrders.length}</p>
+                <p className="text-2xl font-bold">{loading ? '...' : totals.total}</p>
               </div>
             </div>
           </CardContent>
@@ -112,7 +137,7 @@ export default function Orders() {
               <Package className="h-5 w-5 text-blue-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Termo</p>
-                <p className="text-2xl font-bold">{filteredOrders.filter(o => o.productName.includes('Termo')).length}</p>
+                <p className="text-2xl font-bold">{loading ? '...' : totals.termo}</p>
               </div>
             </div>
           </CardContent>
@@ -123,7 +148,7 @@ export default function Orders() {
               <Package className="h-5 w-5 text-green-500" />
               <div>
                 <p className="text-sm text-muted-foreground">D/N</p>
-                <p className="text-2xl font-bold">{filteredOrders.filter(o => o.productName.includes('D/N')).length}</p>
+                <p className="text-2xl font-bold">{loading ? '...' : totals.dn}</p>
               </div>
             </div>
           </CardContent>
@@ -134,7 +159,7 @@ export default function Orders() {
               <Package className="h-5 w-5 text-orange-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Dachowki</p>
-                <p className="text-2xl font-bold">{filteredOrders.filter(o => o.productName.includes('Dachowki')).length}</p>
+                <p className="text-2xl font-bold">{loading ? '...' : totals.dachowki}</p>
               </div>
             </div>
           </CardContent>
@@ -145,7 +170,7 @@ export default function Orders() {
               <Package className="h-5 w-5 text-purple-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Mixed</p>
-                <p className="text-2xl font-bold">{filteredOrders.filter(o => !o.productName.includes('Termo') && !o.productName.includes('D/N') && !o.productName.includes('Dachowki')).length}</p>
+                <p className="text-2xl font-bold">{loading ? '...' : totals.mixed}</p>
               </div>
             </div>
           </CardContent>

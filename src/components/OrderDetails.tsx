@@ -1,16 +1,60 @@
+import React, { useEffect, useState } from 'react'
 import { X, Package, Truck, Clock, Ruler, Palette } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { useDataMode } from "@/contexts/DataContext"
+import { dataService } from "@/services/dataService"
 import { Order } from "@/types/order"
 
 interface OrderDetailsProps {
-  order: Order
+  order: Order | null
+  orderId?: string
   onClose: () => void
 }
 
-export function OrderDetails({ order, onClose }: OrderDetailsProps) {
+export function OrderDetails({ order: initialOrder, orderId, onClose }: OrderDetailsProps) {
+  const [order, setOrder] = useState<Order | null>(initialOrder)
+  const [loading, setLoading] = useState(false)
+  const { useRealData } = useDataMode()
+
+  useEffect(() => {
+    if (!initialOrder && orderId) {
+      const fetchOrder = async () => {
+        setLoading(true)
+        try {
+          const fetchedOrder = await dataService.getOrderById(orderId, useRealData)
+          setOrder(fetchedOrder)
+        } catch (error) {
+          console.error('Failed to fetch order details:', error)
+        } finally {
+          setLoading(false)
+        }
+      }
+      fetchOrder()
+    } else {
+      setOrder(initialOrder)
+    }
+  }, [initialOrder, orderId, useRealData])
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50">
+        <div className="fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%]">
+          <Card>
+            <CardContent className="p-6">
+              <div className="text-center">Loading order details...</div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
+  }
+
+  if (!order) {
+    return null
+  }
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'bg-warning'

@@ -1,32 +1,40 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { TrendingUp, Package, Clock, Truck, DollarSign, Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { mockOrders } from "@/data/mockOrders"
+import { useDataMode } from "@/contexts/DataContext"
+import { dataService } from "@/services/dataService"
 
 export default function Analytics() {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0])
+  const [analytics, setAnalytics] = useState({
+    totalOrders: 0,
+    urgentOrders: 0,
+    statusDistribution: { pending: 0, processing: 0, shipped: 0 },
+    priorityDistribution: { high: 0, medium: 0, low: 0 },
+    courierStats: {} as Record<string, number>
+  })
+  const [loading, setLoading] = useState(false)
   
-  const filteredOrders = mockOrders.filter(order => order.orderDate === selectedDate)
-  const totalOrders = filteredOrders.length
-  const pendingOrders = filteredOrders.filter(o => o.status === 'pending').length
-  const processingOrders = filteredOrders.filter(o => o.status === 'processing').length
-  const shippedOrders = filteredOrders.filter(o => o.status === 'shipped').length
-  const urgentOrders = filteredOrders.filter(o => o.daysLeftToPack <= 1).length
-  
-  const courierStats = mockOrders.reduce((acc, order) => {
-    acc[order.courier] = (acc[order.courier] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
+  const { useRealData } = useDataMode()
 
-  const priorityStats = mockOrders.reduce((acc, order) => {
-    acc[order.priority] = (acc[order.priority] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
+  const fetchAnalytics = async () => {
+    setLoading(true)
+    try {
+      const result = await dataService.getAnalytics({ date: selectedDate }, useRealData)
+      setAnalytics(result)
+    } catch (error) {
+      console.error('Failed to fetch analytics:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  const averagePackingTime = mockOrders.reduce((sum, order) => sum + order.daysLeftToPack, 0) / totalOrders
+  useEffect(() => {
+    fetchAnalytics()
+  }, [selectedDate, useRealData])
 
   return (
     <div className="p-6 space-y-6">
@@ -71,7 +79,7 @@ export default function Analytics() {
               <Package className="h-5 w-5 text-primary" />
               <div>
                 <p className="text-sm text-muted-foreground">Total Orders</p>
-                <p className="text-2xl font-bold">{totalOrders}</p>
+                <p className="text-2xl font-bold">{loading ? '...' : analytics.totalOrders}</p>
               </div>
             </div>
           </CardContent>
@@ -83,7 +91,7 @@ export default function Analytics() {
               <Clock className="h-5 w-5 text-warning" />
               <div>
                 <p className="text-sm text-muted-foreground">Urgent Orders</p>
-                <p className="text-2xl font-bold">{urgentOrders}</p>
+                <p className="text-2xl font-bold">{loading ? '...' : analytics.urgentOrders}</p>
                 <p className="text-xs text-destructive">One day left</p>
               </div>
             </div>
@@ -101,25 +109,25 @@ export default function Analytics() {
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-sm">Pending</span>
-                <span className="text-sm font-medium">{pendingOrders} ({totalOrders > 0 ? Math.round((pendingOrders / totalOrders) * 100) : 0}%)</span>
+                <span className="text-sm font-medium">{analytics.statusDistribution.pending} ({analytics.totalOrders > 0 ? Math.round((analytics.statusDistribution.pending / analytics.totalOrders) * 100) : 0}%)</span>
               </div>
-              <Progress value={totalOrders > 0 ? (pendingOrders / totalOrders) * 100 : 0} className="h-2" />
+              <Progress value={analytics.totalOrders > 0 ? (analytics.statusDistribution.pending / analytics.totalOrders) * 100 : 0} className="h-2" />
             </div>
             
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-sm">Processing</span>
-                <span className="text-sm font-medium">{processingOrders} ({totalOrders > 0 ? Math.round((processingOrders / totalOrders) * 100) : 0}%)</span>
+                <span className="text-sm font-medium">{analytics.statusDistribution.processing} ({analytics.totalOrders > 0 ? Math.round((analytics.statusDistribution.processing / analytics.totalOrders) * 100) : 0}%)</span>
               </div>
-              <Progress value={totalOrders > 0 ? (processingOrders / totalOrders) * 100 : 0} className="h-2" />
+              <Progress value={analytics.totalOrders > 0 ? (analytics.statusDistribution.processing / analytics.totalOrders) * 100 : 0} className="h-2" />
             </div>
             
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-sm">Shipped</span>
-                <span className="text-sm font-medium">{shippedOrders} ({totalOrders > 0 ? Math.round((shippedOrders / totalOrders) * 100) : 0}%)</span>
+                <span className="text-sm font-medium">{analytics.statusDistribution.shipped} ({analytics.totalOrders > 0 ? Math.round((analytics.statusDistribution.shipped / analytics.totalOrders) * 100) : 0}%)</span>
               </div>
-              <Progress value={totalOrders > 0 ? (shippedOrders / totalOrders) * 100 : 0} className="h-2" />
+              <Progress value={analytics.totalOrders > 0 ? (analytics.statusDistribution.shipped / analytics.totalOrders) * 100 : 0} className="h-2" />
             </div>
           </CardContent>
         </Card>
@@ -129,13 +137,13 @@ export default function Analytics() {
             <CardTitle>Priority Distribution</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {Object.entries(priorityStats).map(([priority, count]) => (
+            {Object.entries(analytics.priorityDistribution).map(([priority, count]) => (
               <div key={priority}>
                 <div className="flex justify-between mb-2">
                   <span className="text-sm capitalize">{priority}</span>
-                  <span className="text-sm font-medium">{count} ({totalOrders > 0 ? Math.round((count / totalOrders) * 100) : 0}%)</span>
+                  <span className="text-sm font-medium">{count} ({analytics.totalOrders > 0 ? Math.round((count / analytics.totalOrders) * 100) : 0}%)</span>
                 </div>
-                <Progress value={totalOrders > 0 ? (count / totalOrders) * 100 : 0} className="h-2" />
+                <Progress value={analytics.totalOrders > 0 ? (count / analytics.totalOrders) * 100 : 0} className="h-2" />
               </div>
             ))}
           </CardContent>
@@ -152,7 +160,7 @@ export default function Analytics() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(courierStats).map(([courier, count]) => (
+            {Object.entries(analytics.courierStats).map(([courier, count]) => (
               <div key={courier} className="p-4 border rounded-lg">
                 <h3 className="font-medium mb-2">{courier}</h3>
                 <div className="space-y-2">
@@ -162,9 +170,9 @@ export default function Analytics() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">Share</span>
-                    <span className="text-sm font-medium">{totalOrders > 0 ? Math.round((count / totalOrders) * 100) : 0}%</span>
+                    <span className="text-sm font-medium">{analytics.totalOrders > 0 ? Math.round((count / analytics.totalOrders) * 100) : 0}%</span>
                   </div>
-                  <Progress value={totalOrders > 0 ? (count / totalOrders) * 100 : 0} className="h-2" />
+                  <Progress value={analytics.totalOrders > 0 ? (count / analytics.totalOrders) * 100 : 0} className="h-2" />
                 </div>
               </div>
             ))}
