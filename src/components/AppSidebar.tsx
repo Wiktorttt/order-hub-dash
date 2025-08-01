@@ -40,8 +40,8 @@ export function AppSidebar() {
             </div>
             {!isCollapsed && (
               <div>
-                <h1 className="font-semibold text-lg">OrderFlow</h1>
-                <p className="text-xs text-muted-foreground">Order Management</p>
+                <h1 className="font-semibold text-lg">Rimbo Panel</h1>
+                <p className="text-xs text-muted-foreground">Production Baselinker</p>
               </div>
             )}
           </div>

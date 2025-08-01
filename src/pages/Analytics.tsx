@@ -101,25 +101,25 @@ export default function Analytics() {
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-sm">Pending</span>
-                <span className="text-sm font-medium">{pendingOrders} ({Math.round((pendingOrders / totalOrders) * 100)}%)</span>
+                <span className="text-sm font-medium">{pendingOrders} ({totalOrders > 0 ? Math.round((pendingOrders / totalOrders) * 100) : 0}%)</span>
               </div>
-              <Progress value={(pendingOrders / totalOrders) * 100} className="h-2" />
+              <Progress value={totalOrders > 0 ? (pendingOrders / totalOrders) * 100 : 0} className="h-2" />
             </div>
             
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-sm">Processing</span>
-                <span className="text-sm font-medium">{processingOrders} ({Math.round((processingOrders / totalOrders) * 100)}%)</span>
+                <span className="text-sm font-medium">{processingOrders} ({totalOrders > 0 ? Math.round((processingOrders / totalOrders) * 100) : 0}%)</span>
               </div>
-              <Progress value={(processingOrders / totalOrders) * 100} className="h-2" />
+              <Progress value={totalOrders > 0 ? (processingOrders / totalOrders) * 100 : 0} className="h-2" />
             </div>
             
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-sm">Shipped</span>
-                <span className="text-sm font-medium">{shippedOrders} ({Math.round((shippedOrders / totalOrders) * 100)}%)</span>
+                <span className="text-sm font-medium">{shippedOrders} ({totalOrders > 0 ? Math.round((shippedOrders / totalOrders) * 100) : 0}%)</span>
               </div>
-              <Progress value={(shippedOrders / totalOrders) * 100} className="h-2" />
+              <Progress value={totalOrders > 0 ? (shippedOrders / totalOrders) * 100 : 0} className="h-2" />
             </div>
           </CardContent>
         </Card>
@@ -133,9 +133,9 @@ export default function Analytics() {
               <div key={priority}>
                 <div className="flex justify-between mb-2">
                   <span className="text-sm capitalize">{priority}</span>
-                  <span className="text-sm font-medium">{count} ({Math.round((count / totalOrders) * 100)}%)</span>
+                  <span className="text-sm font-medium">{count} ({totalOrders > 0 ? Math.round((count / totalOrders) * 100) : 0}%)</span>
                 </div>
-                <Progress value={(count / totalOrders) * 100} className="h-2" />
+                <Progress value={totalOrders > 0 ? (count / totalOrders) * 100 : 0} className="h-2" />
               </div>
             ))}
           </CardContent>
@@ -162,9 +162,9 @@ export default function Analytics() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">Share</span>
-                    <span className="text-sm font-medium">{Math.round((count / totalOrders) * 100)}%</span>
+                    <span className="text-sm font-medium">{totalOrders > 0 ? Math.round((count / totalOrders) * 100) : 0}%</span>
                   </div>
-                  <Progress value={(count / totalOrders) * 100} className="h-2" />
+                  <Progress value={totalOrders > 0 ? (count / totalOrders) * 100 : 0} className="h-2" />
                 </div>
               </div>
             ))}
@@ -172,45 +172,6 @@ export default function Analytics() {
         </CardContent>
       </Card>
 
-      {/* Recent Trends */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Performance Insights</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="p-4 bg-success/10 rounded-lg border border-success/20">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="h-4 w-4 text-success" />
-                <span className="text-sm font-medium text-success">Positive Trend</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Order processing time has improved by 15% this month
-              </p>
-            </div>
-
-            <div className="p-4 bg-warning/10 rounded-lg border border-warning/20">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className="h-4 w-4 text-warning" />
-                <span className="text-sm font-medium text-warning">Attention Needed</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {urgentOrders} orders have less than 2 days left to pack
-              </p>
-            </div>
-
-            <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
-              <div className="flex items-center gap-2 mb-2">
-                <Package className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium text-primary">Opportunity</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                FedEx Express handles the most high-priority orders
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }

@@ -17,32 +17,6 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Company Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            Company Information
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="company-name">Company Name</Label>
-              <Input id="company-name" defaultValue="OrderFlow Industries" />
-            </div>
-            <div>
-              <Label htmlFor="contact-email">Contact Email</Label>
-              <Input id="contact-email" type="email" defaultValue="admin@orderflow.com" />
-            </div>
-          </div>
-          <div>
-            <Label htmlFor="company-address">Company Address</Label>
-            <Input id="company-address" defaultValue="123 Business Park, Industrial City, IC 12345" />
-          </div>
-          <Button>Save Changes</Button>
-        </CardContent>
-      </Card>
 
       {/* Order Settings */}
       <Card>

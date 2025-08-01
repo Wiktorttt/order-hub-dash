@@ -12,7 +12,7 @@ export default function PrintDocuments() {
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
   const [selectedOrders, setSelectedOrders] = useState<string[]>([])
-  const [documentType, setDocumentType] = useState("packing-list")
+  const [documentType, setDocumentType] = useState("both")
   const [statusFilter, setStatusFilter] = useState("all")
 
   const filteredOrders = mockOrders.filter(order => {
@@ -82,7 +82,7 @@ export default function PrintDocuments() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Select value={documentType} onValueChange={setDocumentType}>
+          <Select value={documentType} onValueChange={setDocumentType} defaultValue="both">
             <SelectTrigger className="w-64">
               <SelectValue />
             </SelectTrigger>
@@ -215,11 +215,11 @@ export default function PrintDocuments() {
                   />
                   <div>
                     <p className="font-medium">{order.orderId}</p>
-                    <p className="text-sm text-muted-foreground">{order.customerName}</p>
+                    <p className="text-sm text-muted-foreground">{order.productName}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium">{order.productName}</p>
+                  <p className="text-sm font-medium">{order.customerName}</p>
                   <p className="text-sm text-muted-foreground">
                     {new Date(order.orderDate).toLocaleDateString()}
                   </p>
