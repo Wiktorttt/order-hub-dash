@@ -66,58 +66,162 @@ export interface PrintOrdersResponse {
 
 export const webhookService = {
   async getOrders(params: GetOrdersRequest): Promise<GetOrdersResponse> {
-    const response = await fetch(`${WEBHOOK_BASE_URL}/get-orders`, {
-      method: 'POST',
-      headers: WEBHOOK_HEADERS,
-      body: JSON.stringify(params)
-    });
+    const url = `${WEBHOOK_BASE_URL}/get-orders`;
+    const payload = JSON.stringify(params);
     
-    if (!response.ok) {
-      throw new Error(`Failed to fetch orders: ${response.statusText}`);
+    console.log('🚀 WEBHOOK DEBUG - getOrders');
+    console.log('📍 URL:', url);
+    console.log('📦 Payload:', payload);
+    console.log('🔑 Headers:', WEBHOOK_HEADERS);
+    console.log('⏰ Timestamp:', new Date().toISOString());
+    
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: WEBHOOK_HEADERS,
+        body: payload
+      });
+      
+      console.log('📡 Response Status:', response.status);
+      console.log('📡 Response Headers:', Object.fromEntries(response.headers.entries()));
+      
+      if (!response.ok) {
+        console.error('❌ Response not OK:', response.statusText);
+        throw new Error(`Failed to fetch orders: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ Response Data:', data);
+      return data;
+    } catch (error) {
+      console.error('💥 Webhook Error (getOrders):', error);
+      console.error('💥 Error details:', {
+        message: error.message,
+        stack: error.stack,
+        url,
+        payload
+      });
+      throw error;
     }
-    
-    return response.json();
   },
 
   async getOrderById(orderId: string): Promise<Order> {
-    const response = await fetch(`${WEBHOOK_BASE_URL}/get-order`, {
-      method: 'POST',
-      headers: WEBHOOK_HEADERS,
-      body: JSON.stringify({ orderId })
-    });
+    const url = `${WEBHOOK_BASE_URL}/get-order`;
+    const payload = JSON.stringify({ orderId });
     
-    if (!response.ok) {
-      throw new Error(`Failed to fetch order: ${response.statusText}`);
+    console.log('🚀 WEBHOOK DEBUG - getOrderById');
+    console.log('📍 URL:', url);
+    console.log('📦 Payload:', payload);
+    console.log('🔑 Headers:', WEBHOOK_HEADERS);
+    console.log('⏰ Timestamp:', new Date().toISOString());
+    
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: WEBHOOK_HEADERS,
+        body: payload
+      });
+      
+      console.log('📡 Response Status:', response.status);
+      console.log('📡 Response Headers:', Object.fromEntries(response.headers.entries()));
+      
+      if (!response.ok) {
+        console.error('❌ Response not OK:', response.statusText);
+        throw new Error(`Failed to fetch order: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ Response Data:', data);
+      return data;
+    } catch (error) {
+      console.error('💥 Webhook Error (getOrderById):', error);
+      console.error('💥 Error details:', {
+        message: error.message,
+        stack: error.stack,
+        url,
+        payload
+      });
+      throw error;
     }
-    
-    return response.json();
   },
 
   async getAnalytics(params: GetAnalyticsRequest): Promise<GetAnalyticsResponse> {
-    const response = await fetch(`${WEBHOOK_BASE_URL}/get-analytics`, {
-      method: 'POST',
-      headers: WEBHOOK_HEADERS,
-      body: JSON.stringify(params)
-    });
+    const url = `${WEBHOOK_BASE_URL}/get-analytics`;
+    const payload = JSON.stringify(params);
     
-    if (!response.ok) {
-      throw new Error(`Failed to fetch analytics: ${response.statusText}`);
+    console.log('🚀 WEBHOOK DEBUG - getAnalytics');
+    console.log('📍 URL:', url);
+    console.log('📦 Payload:', payload);
+    console.log('🔑 Headers:', WEBHOOK_HEADERS);
+    console.log('⏰ Timestamp:', new Date().toISOString());
+    
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: WEBHOOK_HEADERS,
+        body: payload
+      });
+      
+      console.log('📡 Response Status:', response.status);
+      console.log('📡 Response Headers:', Object.fromEntries(response.headers.entries()));
+      
+      if (!response.ok) {
+        console.error('❌ Response not OK:', response.statusText);
+        throw new Error(`Failed to fetch analytics: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ Response Data:', data);
+      return data;
+    } catch (error) {
+      console.error('💥 Webhook Error (getAnalytics):', error);
+      console.error('💥 Error details:', {
+        message: error.message,
+        stack: error.stack,
+        url,
+        payload
+      });
+      throw error;
     }
-    
-    return response.json();
   },
 
   async getPrintOrders(params: PrintOrdersRequest): Promise<PrintOrdersResponse> {
-    const response = await fetch(`${WEBHOOK_BASE_URL}/get-print-orders`, {
-      method: 'POST',
-      headers: WEBHOOK_HEADERS,
-      body: JSON.stringify(params)
-    });
+    const url = `${WEBHOOK_BASE_URL}/get-print-orders`;
+    const payload = JSON.stringify(params);
     
-    if (!response.ok) {
-      throw new Error(`Failed to fetch print orders: ${response.statusText}`);
+    console.log('🚀 WEBHOOK DEBUG - getPrintOrders');
+    console.log('📍 URL:', url);
+    console.log('📦 Payload:', payload);
+    console.log('🔑 Headers:', WEBHOOK_HEADERS);
+    console.log('⏰ Timestamp:', new Date().toISOString());
+    
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: WEBHOOK_HEADERS,
+        body: payload
+      });
+      
+      console.log('📡 Response Status:', response.status);
+      console.log('📡 Response Headers:', Object.fromEntries(response.headers.entries()));
+      
+      if (!response.ok) {
+        console.error('❌ Response not OK:', response.statusText);
+        throw new Error(`Failed to fetch print orders: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ Response Data:', data);
+      return data;
+    } catch (error) {
+      console.error('💥 Webhook Error (getPrintOrders):', error);
+      console.error('💥 Error details:', {
+        message: error.message,
+        stack: error.stack,
+        url,
+        payload
+      });
+      throw error;
     }
-    
-    return response.json();
   }
 };
