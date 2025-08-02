@@ -1,6 +1,6 @@
 import { Order } from "@/types/order";
 
-const WEBHOOK_BASE_URL = "https://n8n.thesetwomanager.win/webhook-test";
+const WEBHOOK_BASE_URL = "http://n8n.thesetwomanager.win/webhook-test";
 
 const WEBHOOK_HEADERS = {
   "CF-Access-Client-Id": "9447cda6bb8e53ff6c5eed819bd05476.access",
