@@ -10,8 +10,13 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [useRealData, setUseRealData] = useState(false);
 
+  const handleSetUseRealData = (value: boolean) => {
+    console.log('🔄 DATA CONTEXT - Toggle changed to:', value ? 'REAL DATA' : 'MOCK DATA');
+    setUseRealData(value);
+  };
+
   return (
-    <DataContext.Provider value={{ useRealData, setUseRealData }}>
+    <DataContext.Provider value={{ useRealData, setUseRealData: handleSetUseRealData }}>
       {children}
     </DataContext.Provider>
   );

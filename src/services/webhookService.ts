@@ -83,7 +83,7 @@ export const webhookService = {
       });
       
       console.log('📡 Response Status:', response.status);
-      console.log('📡 Response Headers:', Object.fromEntries(response.headers.entries()));
+      console.log('📡 Response OK:', response.ok);
       
       if (!response.ok) {
         console.error('❌ Response not OK:', response.statusText);

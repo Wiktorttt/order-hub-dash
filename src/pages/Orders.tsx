@@ -23,6 +23,11 @@ export default function Orders() {
 
   // Fetch orders data
   const fetchOrders = async () => {
+    console.log('🔄 ORDERS PAGE - fetchOrders called');
+    console.log('📅 Selected Date:', selectedDate);
+    console.log('🎯 Status Filter:', statusFilter);
+    console.log('🔀 Use Real Data:', useRealData);
+    
     setLoading(true)
     try {
       const result = await dataService.getOrders({
@@ -30,16 +35,21 @@ export default function Orders() {
         status: statusFilter === 'all' ? undefined : statusFilter
       }, useRealData)
       
+      console.log('✅ ORDERS PAGE - Data received:', result);
       setOrders(result.orders)
       setTotals(result.totals)
     } catch (error) {
-      console.error('Failed to fetch orders:', error)
+      console.error('💥 ORDERS PAGE - Failed to fetch orders:', error)
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
+    console.log('🎬 ORDERS PAGE - useEffect triggered');
+    console.log('📅 selectedDate changed to:', selectedDate);
+    console.log('🎯 statusFilter changed to:', statusFilter);
+    console.log('🔀 useRealData changed to:', useRealData);
     fetchOrders()
   }, [selectedDate, statusFilter, useRealData])
 

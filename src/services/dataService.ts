@@ -105,9 +105,15 @@ const mockDataService = {
 // Data service that switches between mock and real data
 export const dataService = {
   async getOrders(params: GetOrdersRequest, useRealData: boolean) {
+    console.log('🔀 DATA SERVICE - getOrders called');
+    console.log('📊 Mode:', useRealData ? 'REAL DATA' : 'MOCK DATA');
+    console.log('📋 Params:', params);
+    
     if (useRealData) {
+      console.log('➡️ Calling webhook service...');
       return await webhookService.getOrders(params);
     }
+    console.log('➡️ Calling mock service...');
     return await mockDataService.getOrders(params);
   },
 
