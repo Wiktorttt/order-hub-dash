@@ -1,6 +1,6 @@
 import { Order } from "@/types/order";
 
-const WEBHOOK_BASE_URL = "https://nginx.thesetwomanager.win";
+const WEBHOOK_BASE_URL = "https://nginx.thesetwomanager.win/webhook-test";
 
 const WEBHOOK_HEADERS = {
   "Content-Type": "application/json"
