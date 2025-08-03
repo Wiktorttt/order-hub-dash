@@ -1,12 +1,9 @@
 import { Order } from "@/types/order";
 
-const WEBHOOK_BASE_URL = "https://n8n.thesetwomanager.win/webhook-test";
+const WEBHOOK_BASE_URL = "https://n8n-proxy.thesetwomanager.win/webhook-test";
 
 const WEBHOOK_HEADERS = {
-  "CF-Access-Client-Id": "9447cda6bb8e53ff6c5eed819bd05476.access",
-  "CF-Access-Client-Secret": "eb1d92f06f95c41197583b80a9ae247d04b1dc400545c16a9ae247d04b1dc400545c16a9f3135147cd51148",
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "https://order-hub-dash.lovable.app/"
+  "Content-Type": "application/json"
 };
 
 export interface GetOrdersRequest {
